@@ -110,6 +110,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="MyMap.h" />
+    <ClInclude Include="provided.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AttractionMapper.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MapLoader.cpp" />
+    <ClCompile Include="Navigator.cpp" />
+    <ClCompile Include="SegmentMapper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
