@@ -40,9 +40,10 @@ private:
 		node* left; //smaller 
 		node* right; //larger
 	};
+	int m_size; 
 	node *root;
 	void destory_tree(node* leaf);
-	int size_helper(node* point);
+	int size_helper(node* point) const;
 	ValueType* find_helper(const KeyType& key, node*leaf) const;
 	void associate_helper(const KeyType & key, const ValueType & value, node* leaf);
 	//node* newNode(const KeyType& key, const ValueType& value);
@@ -52,6 +53,7 @@ template<typename KeyType, typename ValueType>
 inline MyMap<KeyType, ValueType>::MyMap()
 {
 	root = nullptr;
+	m_size = 0;
 }
 
 template<typename KeyType, typename ValueType>
@@ -64,6 +66,7 @@ template<typename KeyType, typename ValueType>
 inline void MyMap<KeyType, ValueType>::clear()
 {
 	destory_tree(root);
+	root = nullptr;
 }
 
 template<typename KeyType, typename ValueType>
@@ -100,22 +103,28 @@ inline void MyMap<KeyType, ValueType>::destory_tree(node * leaf)
 		destory_tree(leaf->left);
 		destory_tree(leaf->right);
 		delete leaf;
+		m_size--;
+		
 	}
 	return;
 }
 
 template<typename KeyType, typename ValueType>
-inline int MyMap<KeyType, ValueType>::size_helper(node * point)
+inline int MyMap<KeyType, ValueType>::size_helper(node * point) const
 {
-	int count = 0;
+	/*int count = 0;
 	if (point != nullptr)
 	{
+		count++;
 		count += size_helper(point->left);
 		count += size_helper(point->right);
-		count++;
 	}
-	return count;
+	else
+		return 0;
+	return count;*/
+	return m_size;
 }
+
 
 template<typename KeyType, typename ValueType>
 inline ValueType * MyMap<KeyType, ValueType>::find_helper(const KeyType & key, node * leaf) const
@@ -148,6 +157,7 @@ inline void MyMap<KeyType, ValueType>::associate_helper(const KeyType & key, con
 		root->m_value = value; 
 		root->right = nullptr;
 		root->left = nullptr;
+		m_size++;
 		//root = newNode(key, value);
 	}
 	else if (key == leaf->m_key)
@@ -167,6 +177,7 @@ inline void MyMap<KeyType, ValueType>::associate_helper(const KeyType & key, con
 			leaf->left->m_value = value;
 			leaf->left->left = nullptr;
 			leaf->left->right = nullptr;
+			m_size++;
 		}
 	}
 	else if (key > leaf->m_key)
@@ -181,6 +192,7 @@ inline void MyMap<KeyType, ValueType>::associate_helper(const KeyType & key, con
 			leaf->right->m_value = value;
 			leaf->right->left = nullptr;
 			leaf->right->right = nullptr;
+			m_size++;
 		}
 	}
 }

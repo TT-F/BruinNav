@@ -123,6 +123,10 @@
     <ClCompile Include="Navigator.cpp" />
     <ClCompile Include="SegmentMapper.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="mapdata.txt" />
+    <Text Include="validlocs.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
