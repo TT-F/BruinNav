@@ -100,10 +100,12 @@ void testMaps()
 
 	cout << "AttractionMapper passed all tests" << endl;
 
-	/*
+	
 	SegmentMapper sm;
 	chrono::high_resolution_clock::time_point t5 = chrono::high_resolution_clock::now();
+	cout << "point F" << endl;
 	sm.init(m);
+	cout << "point G" << endl;
 	chrono::high_resolution_clock::time_point t6 = chrono::high_resolution_clock::now();
 	cout << "Time to init SegmentMapper:" << chrono::duration_cast<chrono::milliseconds>(t6 - t5).count() << "ms" << endl;
 	GeoCoord lookMeUp("34.0692072", "-118.4066994");
@@ -123,7 +125,7 @@ void testMaps()
 			" attractions on it." << endl;
 	}
 
-	cout << "All tests passed" << endl;*/
+	cout << "All tests passed" << endl;
 }
 
 

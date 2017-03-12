@@ -125,7 +125,6 @@ inline int MyMap<KeyType, ValueType>::size_helper(node * point) const
 	return m_size;
 }
 
-
 template<typename KeyType, typename ValueType>
 inline ValueType * MyMap<KeyType, ValueType>::find_helper(const KeyType & key, node * leaf) const
 {
