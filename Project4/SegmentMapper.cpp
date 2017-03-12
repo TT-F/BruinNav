@@ -53,15 +53,19 @@ void SegmentMapperImpl::init(const MapLoader& ml)
 		}
 		else
 			My_segment.associate(numst, segments_loader);
+		vector<StreetSegment*> segments_loader_1;
+		segments_loader_1.push_back(st_ptr);
 		if (My_segment.find(numed) != nullptr)
 		{
-			segments_loader = *My_segment.find(numed);
-			segments_loader.push_back(st_ptr);
-			My_segment.associate(numed, segments_loader);
+			segments_loader_1 = *My_segment.find(numed);
+			segments_loader_1.push_back(st_ptr);
+			My_segment.associate(numed, segments_loader_1);
 		}
 		else
-			My_segment.associate(numed, segments_loader);
+			My_segment.associate(numed, segments_loader_1);
 		//Attraction
+		vector<StreetSegment*> segments_loader_2;
+		segments_loader_2.push_back(st_ptr);
 		int att_size = st_ptr->attractions.size();
 		int walk = 0;
 		//	cerr << "SGM for loop check point C" << endl;
@@ -71,12 +75,12 @@ void SegmentMapperImpl::init(const MapLoader& ml)
 			string loc = geo_to_num(st_ptr->attractions[walk].geocoordinates);
 			if (My_segment.find(loc) != nullptr)
 			{
-				segments_loader = *My_segment.find(loc);
-				segments_loader.push_back(st_ptr);
-				My_segment.associate(loc, segments_loader);
+				segments_loader_2 = *My_segment.find(loc);
+				segments_loader_2.push_back(st_ptr);
+				My_segment.associate(loc, segments_loader_2);
 			}
 			else
-				My_segment.associate(loc, segments_loader);
+				My_segment.associate(loc, segments_loader_2);
 			walk++;
 		}
 	}

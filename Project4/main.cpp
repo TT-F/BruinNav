@@ -121,7 +121,7 @@ void testMaps()
 void testNav()
 {
 	Navigator nv;
-	nv.loadMapData("/Users/runjiali/Documents/CS32/CS32_Repo/Projects/Project_4/Project_4/Project_4/mapdata.txt");
+	nv.loadMapData("C:/Users/Steven Shi/Source/Repos/Project4/Project4/mapdata.txt");
 	vector<NavSegment> segs;
 	nv.navigate("Los Angeles Fire Department Fire Station 92", "UCLA Police Department", segs);
 	double distance = 0;
