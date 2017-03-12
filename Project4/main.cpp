@@ -58,9 +58,8 @@ void testMyMap()
 	cout << "Linda is not in the roster!" << endl;
 	else
 	cout << "Linda’s GPA is: " << *lindasGPA << endl;*/
-	//cerr << nameToGPA.size();
+
 	nameToGPA.clear();
-	//cerr << nameToGPA.size();
 	assert(nameToGPA.size() == 0);
 	assert(nameToGPA.find("Carey") == nullptr);
 	assert(nameToGPA.find("David") == nullptr);
@@ -73,15 +72,11 @@ void testMaps()
 {
 	MapLoader m;
 	chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
-	cout << "point A" << endl;
 	assert(m.load("C:/Users/Steven Shi/Source/Repos/Project4/Project4/mapdata.txt"));
-	cout << "point B" << endl;
 	chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
 	cout << "Time to load data: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << "ms" << endl;
-
 	StreetSegment s;
 	m.getSegment(4, s);
-	cout << "point C" << endl;
 	assert(s.streetName == "13th Helena Drive" && s.segment.start.longitudeText == "-118.4798135");
 
 	cout << "MapLoader passed all tests" << endl;
@@ -89,9 +84,7 @@ void testMaps()
 
 	AttractionMapper am;
 	chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
-	cout << "point D" << endl;
 	am.init(m);
-	cout << "point E" << endl;
 	chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
 	cout << "Time to init AttractionMapper:" << chrono::duration_cast<chrono::milliseconds>(t4 - t3).count() << "ms" << endl;
 	GeoCoord gc;
@@ -100,12 +93,10 @@ void testMaps()
 
 	cout << "AttractionMapper passed all tests" << endl;
 
-	
+
 	SegmentMapper sm;
 	chrono::high_resolution_clock::time_point t5 = chrono::high_resolution_clock::now();
-	cout << "point F" << endl;
 	sm.init(m);
-	cout << "point G" << endl;
 	chrono::high_resolution_clock::time_point t6 = chrono::high_resolution_clock::now();
 	cout << "Time to init SegmentMapper:" << chrono::duration_cast<chrono::milliseconds>(t6 - t5).count() << "ms" << endl;
 	GeoCoord lookMeUp("34.0692072", "-118.4066994");
@@ -124,8 +115,28 @@ void testMaps()
 			s.segment.end.longitudeText << endl; cout << "This segment has " << s.attractions.size() <<
 			" attractions on it." << endl;
 	}
-
 	cout << "All tests passed" << endl;
+}
+
+void testNav()
+{
+	Navigator nv;
+	nv.loadMapData("/Users/runjiali/Documents/CS32/CS32_Repo/Projects/Project_4/Project_4/Project_4/mapdata.txt");
+	vector<NavSegment> segs;
+	nv.navigate("Los Angeles Fire Department Fire Station 92", "UCLA Police Department", segs);
+	double distance = 0;
+	for (size_t i = 0; i < segs.size(); i++)
+	{
+		if (segs[i].m_command == NavSegment::PROCEED)
+		{
+			distance += segs[i].m_distance;
+			cout << "Proceed " << segs[i].m_direction << " " << segs[i].m_distance << " km on " << segs[i].m_streetName << endl;
+		}
+		else
+			cout << "Turn " << segs[i].m_direction << " onto " << segs[i].m_streetName << endl;
+	}
+	cout << distance << " km in total." << endl;
+	cout << "Passed" << endl;
 }
 
 
