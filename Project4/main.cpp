@@ -87,9 +87,11 @@ void testMaps()
 	cout << "MapLoader passed all tests" << endl;
 
 
-	/*AttractionMapper am;
+	AttractionMapper am;
 	chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
+	cout << "point D" << endl;
 	am.init(m);
+	cout << "point E" << endl;
 	chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
 	cout << "Time to init AttractionMapper:" << chrono::duration_cast<chrono::milliseconds>(t4 - t3).count() << "ms" << endl;
 	GeoCoord gc;
@@ -98,7 +100,7 @@ void testMaps()
 
 	cout << "AttractionMapper passed all tests" << endl;
 
-
+	/*
 	SegmentMapper sm;
 	chrono::high_resolution_clock::time_point t5 = chrono::high_resolution_clock::now();
 	sm.init(m);

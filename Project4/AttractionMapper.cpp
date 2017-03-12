@@ -1,4 +1,5 @@
 #include "provided.h"
+#include "MyMap.h"
 #include <string>
 using namespace std;
 
@@ -9,6 +10,8 @@ public:
 	~AttractionMapperImpl();
 	void init(const MapLoader& ml);
 	bool getGeoCoord(string attraction, GeoCoord& gc) const;
+private:
+	MyMap<string, GeoCoord> Att_hld; 
 };
 
 AttractionMapperImpl::AttractionMapperImpl()
@@ -17,15 +20,41 @@ AttractionMapperImpl::AttractionMapperImpl()
 
 AttractionMapperImpl::~AttractionMapperImpl()
 {
+	Att_hld.clear();
 }
 
 void AttractionMapperImpl::init(const MapLoader& ml)
 {
+	int size = ml.getNumSegments();
+	//cerr << "number of segments" << size << endl;
+	for (int i = 0; i < size; i++)
+	{
+		//cerr << "processing " << i << " segament" << endl;
+		StreetSegment st_ptr; 
+		ml.getSegment(i, st_ptr);
+
+		int att_size = st_ptr.attractions.size(); //att_size is 0 if there is no attraction 
+		int walk = 0;
+		while (walk < att_size) //skip when there is no attraction 
+		{
+			Att_hld.associate(st_ptr.attractions[walk].name,st_ptr.attractions[walk].geocoordinates);
+			walk++;
+		}
+	}
+
 }
 
 bool AttractionMapperImpl::getGeoCoord(string attraction, GeoCoord& gc) const
 {
-	return false;  // This compiles, but may not be correct
+	const GeoCoord* gc_ptr = new GeoCoord();
+	gc_ptr = Att_hld.find(attraction);
+	if (gc_ptr != nullptr)
+	{
+		gc = *gc_ptr;
+		return true; 
+	}
+	else
+		return false; 
 }
 
 //******************** AttractionMapper functions *****************************

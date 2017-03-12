@@ -53,7 +53,7 @@ bool MapLoaderImpl::load(string mapFile)
 		int count;
 		infile >> count;
 		//cerr << "Initial count" << count << endl;
-		infile.ignore(10000, '\n');
+		infile.ignore(1000, '\n');
 		//cerr << "entering load function CP 4" << endl;
 		string att_name, att_lat, att_long;
 		while (count!= 0)
