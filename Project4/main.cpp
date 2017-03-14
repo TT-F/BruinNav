@@ -123,19 +123,20 @@ void testNav()
 	Navigator nv;
 	nv.loadMapData("C:/Users/Steven Shi/Source/Repos/Project4/Project4/mapdata.txt");
 	vector<NavSegment> segs;
-	nv.navigate("Los Angeles Fire Department Fire Station 92", "UCLA Police Department", segs);
-	double distance = 0;
-	for (size_t i = 0; i < segs.size(); i++)
-	{
-		if (segs[i].m_command == NavSegment::PROCEED)
-		{
-			distance += segs[i].m_distance;
-			cout << "Proceed " << segs[i].m_direction << " " << segs[i].m_distance << " km on " << segs[i].m_streetName << endl;
-		}
-		else
-			cout << "Turn " << segs[i].m_direction << " onto " << segs[i].m_streetName << endl;
-	}
-	cout << distance << " km in total." << endl;
+	cerr<< nv.navigate("Los Angeles Fire Department Fire Station 92", "UCLA Police Department", segs);
+	//cerr << nv.navigate("1031 Broxton Avenue", "1061 Broxton Avenue", segs);
+	//double distance = 0;
+	//for (size_t i = 0; i < segs.size(); i++)
+	//{
+	//	if (segs[i].m_command == NavSegment::PROCEED)
+	//	{
+	//		distance += segs[i].m_distance;
+	//		cout << "Proceed " << segs[i].m_direction << " " << segs[i].m_distance << " km on " << segs[i].m_streetName << endl;
+	//	}
+	//	else
+	//		cout << "Turn " << segs[i].m_direction << " onto " << segs[i].m_streetName << endl;
+	//}
+	//cout << distance << " km in total." << endl;
 	cout << "Passed" << endl;
 }
 
@@ -144,7 +145,8 @@ void testNav()
 int main()
 {
 	//foo();
-	testMyMap();
-	testMaps();
+	//testMyMap();
+	//testMaps();
+	testNav();
 
 }
