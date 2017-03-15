@@ -23,8 +23,37 @@ private:
 	MapLoader ml;
 	vector<GeoCoord> surrond_cord(const GeoCoord& start) const;
 	string angle_calculator(const GeoCoord& a, const GeoCoord& b);
-	bool reconstruct_street(const GeoCoord& start, const GeoCoord& end, StreetSegment& ss);
 	bool reconstruct_path(GeoCoord& current, MyMap<GeoCoord, GeoCoord>& prev,  vector<NavSegment>& direction) const;
+	struct node
+	{
+		node() {};
+		node(GeoCoord geo, std::string streetname) : node_geo(geo), street_name(streetname)
+		{};
+		bool operator== (const node& a)
+		{
+			if (node_geo == a.node_geo && street_name == a.street_name)
+				return true;
+			else
+				return false; 
+		}
+		bool operator< (const node& a)
+		{
+			if (node_geo < a.node_geo)
+				return true;
+			else
+				return false; 
+		}
+		bool operator> (const node& a)
+		{
+			if (node_geo > a.node_geo)
+				return true;
+			else
+				return false;
+		}
+
+		GeoCoord node_geo;
+		std::string street_name;
+	};
 };
 
 NavigatorImpl::NavigatorImpl()
@@ -87,15 +116,9 @@ string NavigatorImpl::angle_calculator(const GeoCoord & a, const GeoCoord & b)
 		return "south";
 	if (ang >= 292.5 && ang <= 337.5)
 		return "southeast";
-	if (ang >= 337.5 && ang <= 360)
+	else if (ang >= 337.5 && ang <= 360)
 		return "east";
 
-}
-
-bool NavigatorImpl::reconstruct_street(const GeoCoord & start, const GeoCoord & end, StreetSegment & ss)
-{
-
-	return false;
 }
 
 bool NavigatorImpl::reconstruct_path(GeoCoord & current, MyMap<GeoCoord, GeoCoord>& prev, vector<NavSegment>& direction) const
@@ -110,21 +133,16 @@ bool NavigatorImpl::reconstruct_path(GeoCoord & current, MyMap<GeoCoord, GeoCoor
 		geo_hld.push(*previous_cord);
 		previous_cord = prev.find(*previous_cord);
 	}
-	cerr << " =======================p1 ==========================" << endl;
-	//while (!geo_hld.empty())
-	//{
-	//	//cerr << sm.getSegments(geo_hld.top()).front().streetName << endl;
-	//	//cerr << sm.getSegments(geo_hld.top()).front().segment.start.latitudeText << "," << sm.getSegments(geo_hld.top()).front().segment.start.longitudeText << endl;
-	//	//cerr << sm.getSegments(geo_hld.top()).front().segment.end.latitudeText << "," << sm.getSegments(geo_hld.top()).front().segment.end.longitudeText << endl;
-	//	geo_hld.pop();
-	//}
+	
+
+
 	return true;
 }
 
 
 NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &directions) const
 {
-	//chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
+	////chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
 
 	GeoCoord start_cord, end_cord;
 	if (!am.getGeoCoord(start, start_cord))
@@ -134,7 +152,8 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 
 
 	vector<GeoCoord> openset;
-	MyMap<GeoCoord, bool> closedset;
+	MyMap<GeoCoord, string> closedset;
+	//vector<GeoCoord> closedset;
 
 	openset.push_back(start_cord);
 
@@ -144,7 +163,7 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 	gScore.associate(start_cord, 0);
 	MyMap<GeoCoord, double> fScore;
 	fScore.associate(start_cord, distanceEarthKM(start_cord, end_cord));
-
+	//int count = 0;
 	while (!openset.empty())
 	{
 		//cerr << "========================WHILE LOOP=====================" << endl;
@@ -155,15 +174,13 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 		{
 			//cerr << "========================1st FOR LOOP=====================" << endl;
 			double temp_fScore = *fScore.find(openset[i]);
-			if (temp_fScore < temp_lowest_f_score)
-			{
+			if (temp_fScore < temp_lowest_f_score)	
 				temp_lowest_f_score = temp_fScore;
+			if (temp_fScore < temp_lowest_f_score)
 				delete_index = i;
-				current = openset[i];
-				//cerr << current.latitudeText << "," << current.longitudeText << endl;
-			}
 		}
-		//cerr << sm.getSegments(current).front().streetName << endl;
+
+		current = openset[delete_index];
 		if (current == end_cord)
 		{
 			if (reconstruct_path(end_cord, prevnode, directions))
@@ -172,44 +189,33 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 				return NAV_SUCCESS;
 		}
 		openset.erase(openset.begin() + delete_index);
-		closedset.associate(current,false);
+		closedset.associate(current, "abc");
 
 		vector<GeoCoord> surround = surrond_cord(current);
+		
 		for (int i = 0; i < surround.size();i++)
 		{
-			//cerr << "========================2nd FOR LOOP=====================" << endl;
-			//cerr << surround[i].latitudeText << "," << surround[i].longitudeText << endl;
-			if (closedset.find(surround[i]) != nullptr)
-			{
-				//cerr << surround[i].latitude << "," << surround[i].longitude << endl;
-				continue;
-			}
 
+			if (closedset.find(surround[i]) != nullptr)
+
+				continue;
 			
 			double tent_gScore = *gScore.find(current) + distanceEarthKM(current, surround[i]);
-			if (!geo_included(surround[i], openset))
-			{				
+			if (!geo_included(surround[i], openset))				
 				openset.push_back(surround[i]);
-				//cerr << surround[i].latitudeText << "," << surround[i].longitudeText << endl;
-			}				
+			
 			else if (tent_gScore >= *gScore.find(surround[i]))
-			{			
-				//cerr << surround[i].latitudeText << "," << surround[i].longitudeText << endl;
 				continue;
-			}
 
 			prevnode.associate(surround[i], current);
-			//cerr << surround[i].latitude << "," << surround[i].longitude << endl;
 			gScore.associate(surround[i], tent_gScore);
 			fScore.associate(surround[i], *gScore.find(surround[i]) + distanceEarthKM(surround[i], end_cord));
 
 		}
+		
 	}
+	
 	return NAV_NO_ROUTE;
-
-
-
-
 
 
 }

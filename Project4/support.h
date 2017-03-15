@@ -34,5 +34,6 @@ bool operator== (const GeoCoord& Geo_1, const GeoCoord& Geo_2);
 bool geo_included(const GeoCoord& coord, const std::vector<GeoCoord>& vec);
 
 
+
 #endif // !Sup_h
 
