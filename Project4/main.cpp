@@ -126,12 +126,12 @@ void testNav()
 	//cerr<< nv.navigate("Los Angeles Fire Department Fire Station 92", "UCLA Police Department", segs);
 	//cerr << nv.navigate( "Beverly Hills Marriott", "Nuart Theatre", segs);
 	//cerr << nv.navigate("Beverly Hills Marriott", "De Neve Plaza", segs);
-	//cerr << nv.navigate(  "Nuart Theatre", "De Neve Plaza", segs);
-	cerr << nv.navigate("Nuart Theatre", "Beverly Hills Marriott", segs);
+	cerr << nv.navigate(  "Nuart Theatre", "De Neve Plaza", segs);
+	//cerr << nv.navigate("Nuart Theatre", "Beverly Hills Marriott", segs);
 	//cerr << nv.navigate("Beverly Hills Marriott", "The Playboy Mansion", segs);
 	//cerr << nv.navigate("Nuart Theatre", "The Playboy Mansion", segs);
 	//cerr << nv.navigate("1061 Broxton Avenue", "Headlines!", segs);
-	double distance = 0;
+	/*double distance = 0;
 	for (size_t i = 0; i < segs.size(); i++)
 	{
 		if (segs[i].m_command == NavSegment::PROCEED)
@@ -143,7 +143,7 @@ void testNav()
 			cout << "Turn " << segs[i].m_direction << " onto " << segs[i].m_streetName << endl;
 	}
 	cout << distance << " km in total." << endl;
-	cout << "Passed" << endl;
+	cout << "Passed" << endl;*/
 }
 
 

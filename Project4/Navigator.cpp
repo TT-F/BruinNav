@@ -266,11 +266,9 @@ double NavigatorImpl::GetAngleABC(const GeoCoord & a, const GeoCoord & b, const 
 	return (double)floor(alpha * 180 / 3.1415926 + 0.5);
 }
 
-
 NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &directions) const
 {
-	////chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
-
+	
 	node start_cord, end_cord;
 	if (!am.getGeoCoord(start, start_cord.node_geo))
 		return NAV_BAD_SOURCE;
@@ -282,7 +280,7 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 	end_cord.street_name = sm.getSegments(end_cord.node_geo).front().streetName;
 
 
-	vector<node> openset;
+	vector<node> openset; //use heap??
 	MyMap<node, string> closedset;
 	//vector<node> closedset;
 
@@ -300,28 +298,30 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 		//cerr << "========================WHILE LOOP=====================" << endl;
 		unsigned delete_index = 0;
 		node current = openset[0];
-		double temp_lowest_f_score = *fScore.find(openset[0]);
-		for (int i = 0; i < openset.size();i++)
+		double curr_lowest_f_score = *fScore.find(openset[0]);
+		for (int i = 1; i < openset.size();i++)
 		{
 			//cerr << "========================1st FOR LOOP=====================" << endl;
 			double temp_fScore = *fScore.find(openset[i]);
-			if (temp_fScore < temp_lowest_f_score)
+			if (temp_fScore < curr_lowest_f_score)
 			{
-				//delete_index = i;
-				temp_lowest_f_score = temp_fScore;
+				delete_index = i;
+				//cerr << "i " << i << endl;
+				//cerr << openset[delete_index].node_geo.latitudeText << "," << openset[delete_index].node_geo.longitudeText << endl;
+				curr_lowest_f_score = temp_fScore;
 			}
 				
-			if (temp_fScore < temp_lowest_f_score)
-				delete_index = i;
+			//if (temp_fScore < temp_lowest_f_score)
+			//	delete_index = i;
 		}
 
 		current = openset[delete_index];
 		if (current == end_cord)
 		{
 			if (reconstruct_path(end_cord, prevnode, directions))
-				/*chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
-				cout << "Time to find route: " << chrono::duration_cast<chrono::milliseconds>(t2 - t1).count() << "ms" << endl;*/
 				return NAV_SUCCESS;
+			else
+				return NAV_NO_ROUTE;
 		}
 		openset.erase(openset.begin() + delete_index);
 		closedset.associate(current, "abc");
@@ -332,7 +332,6 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 		{
 
 			if (closedset.find(surround[i]) != nullptr)
-
 				continue;
 			
 			double tent_gScore = *gScore.find(current) + distanceEarthKM(current.node_geo, surround[i].node_geo);
