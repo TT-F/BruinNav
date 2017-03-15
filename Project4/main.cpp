@@ -123,8 +123,9 @@ void testNav()
 	Navigator nv;
 	nv.loadMapData("C:/Users/Steven Shi/Source/Repos/Project4/Project4/mapdata.txt");
 	vector<NavSegment> segs;
-	cerr<< nv.navigate("Los Angeles Fire Department Fire Station 92", "UCLA Police Department", segs);
-	//cerr << nv.navigate("1031 Broxton Avenue", "1061 Broxton Avenue", segs);
+	//cerr<< nv.navigate("Los Angeles Fire Department Fire Station 92", "UCLA Police Department", segs);
+	cerr << nv.navigate("Century City Heliport", "Barney's Beanery", segs);
+	//cerr << nv.navigate("1061 Broxton Avenue", "Headlines!", segs);
 	//double distance = 0;
 	//for (size_t i = 0; i < segs.size(); i++)
 	//{

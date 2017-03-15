@@ -14,6 +14,7 @@ public:
 private:
 	//vector<StreetSegment> seg_map;
 	MyMap<string, vector<StreetSegment*>> My_segment;
+	
 };
 
 SegmentMapperImpl::SegmentMapperImpl()

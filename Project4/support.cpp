@@ -33,12 +33,12 @@ std::string geo_to_num(GeoCoord input_geo)
 
 bool operator< (const GeoCoord& Geo_1, const GeoCoord& Geo_2)
 {
-	return (Geo_1.latitude < Geo_2.latitude && Geo_1.longitude < Geo_2.longitude);
+	return (Geo_1.latitude < Geo_2.latitude );
 }
 
 bool operator> (const GeoCoord& Geo_1, const GeoCoord& Geo_2)
 {
-	return (Geo_1.latitude > Geo_2.latitude && Geo_1.longitude > Geo_2.longitude);
+	return (Geo_1.latitude > Geo_2.latitude );
 }
 
 bool operator== (const GeoCoord& Geo_1, const GeoCoord& Geo_2)
