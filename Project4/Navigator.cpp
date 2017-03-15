@@ -23,10 +23,11 @@ private:
 	SegmentMapper sm;
 	MapLoader ml;
 	vector<node> surrond_cord(const node& input) const;
-	string angle_calculator(const node& a, const node& b);
+	string angle_calculator(const node& a, const node& b) const;
+	bool reconstruct_road(node& g1, node& g2, StreetSegment& s) const; 
 	bool reconstruct_path(node& current, MyMap<node, node>& prev,  vector<NavSegment>& direction) const;
 	bool geo_included(const node& coord, const std::vector<node>& vec) const;
-
+	double GetAngleABC(const GeoCoord& a, const GeoCoord& b, const GeoCoord& c) const; 
 };
 
 NavigatorImpl::NavigatorImpl()
@@ -51,7 +52,14 @@ bool NavigatorImpl::loadMapData(string mapFile)
 		return false;
 }
 
-
+string directiont(const GeoSegment& line1, const GeoSegment& line2)
+{
+	if (angleBetween2Lines(line1, line2) > 180.0)
+		return "right";
+	else
+		return "left";
+	//return angleBetween2Lines(line1, line2) > 180.0 ? "right" : "left";
+}
 
 vector<node> NavigatorImpl::surrond_cord(const node & input) const
 {
@@ -86,7 +94,7 @@ vector<node> NavigatorImpl::surrond_cord(const node & input) const
 	return cord;
 }
 
-string NavigatorImpl::angle_calculator(const node & a, const node & b)
+string NavigatorImpl::angle_calculator(const node & a, const node & b) const
 {
 	GeoSegment temp(a.node_geo, b.node_geo);
 	double ang = angleOfLine(temp);
@@ -111,6 +119,28 @@ string NavigatorImpl::angle_calculator(const node & a, const node & b)
 
 }
 
+bool NavigatorImpl::reconstruct_road(node & a, node & b, StreetSegment & s) const
+{
+	vector<StreetSegment> ss1 = sm.getSegments(a.node_geo);
+	vector<StreetSegment> ss2 = sm.getSegments(b.node_geo);
+	//cerr << "successfully construct" << endl;
+	for (unsigned i = 0; i < ss1.size();i++)
+	{
+		for (unsigned k = 0; k < ss2.size();k++)
+		{
+
+			if (ss1[i].streetName == ss2[k].streetName)
+			{
+				//cerr << "found" << endl;
+				s = ss1[i];
+				//cerr << "successfully return" << endl;
+				return true;
+			}
+		}
+	}
+	return false; 
+}
+
 bool NavigatorImpl::reconstruct_path(node & current, MyMap<node, node>& prev, vector<NavSegment>& direction) const
 {
 	stack<node> geo_hld;
@@ -123,9 +153,89 @@ bool NavigatorImpl::reconstruct_path(node & current, MyMap<node, node>& prev, ve
 		geo_hld.push(*previous_cord);
 		previous_cord = prev.find(*previous_cord);
 	}
+	vector<NavSegment> nav;
+	while (!geo_hld.empty())
+	{
+		/*node t1 = geo_hld.top();
+		geo_hld.pop();
+		if (geo_hld.empty())
+			break;
+		node t2 = geo_hld.top();
+		
+		string dir;
+		string name; 
+		double distance; 
+		GeoSegment gse;
+		vector<NavSegment> route;
+
+		if (t1.street_name != t2.street_name)
+		{
+			geo_hld.pop();
+			
+			node t3 = geo_hld.top();
+			geo_hld.push(t2);
+			GeoSegment a;
+			GeoSegment b;
+			a.start = t1.node_geo;
+			a.end = t2.node_geo;
+			b.start = t2.node_geo;
+			b.end = t3.node_geo;
+			cerr << t1.street_name << endl << GetAngleABC(t1.node_geo,t2.node_geo,t3.node_geo) << endl << t2.street_name << " " << t3.street_name << endl << endl;;
+			if (GetAngleABC(t1.node_geo, t2.node_geo, t3.node_geo) < 0)
+				dir = "right";
+			else
+				dir = "left";
+			name = t2.street_name;
+			NavSegment at(dir, name);
+			direction.push_back(at);
+			name = t2.street_name;
+			dir = angle_calculator(t1, t2);
+			distance = distanceEarthKM(t1.node_geo, t2.node_geo);
+			gse.start = t1.node_geo;
+			gse.end = t2.node_geo;
+			NavSegment att(dir, name, distance, gse);
+			direction.push_back(att);
+		}
+		if (t1.street_name == t2.street_name)
+		{
+			name = t1.street_name;
+			dir = angle_calculator(t1, t2);
+			distance = distanceEarthKM(t1.node_geo, t2.node_geo);
+			gse.start = t1.node_geo;
+			gse.end = t2.node_geo;
+			NavSegment at(dir, name, distance, gse);
+			direction.push_back(at);
+		}*/
+		//cerr << "entering while loop" << endl;
+		node g1 = geo_hld.top();
+		geo_hld.pop();
+		if (geo_hld.empty())
+			break;
+		node g2 = geo_hld.top();
+		//cerr << "pass nodes " << endl;
+		StreetSegment s;
+		//cerr << "street segment " << endl;
+		if (!reconstruct_road(g1, g2, s))
+			return false;
+		//cerr << "road found" << endl;
+		string dir= angle_calculator(g1, g2);
+		string name= s.streetName;
+		double distance = distanceEarthKM(g1.node_geo, g2.node_geo);
+		GeoSegment gse = GeoSegment(g1.node_geo, g2.node_geo);
+		NavSegment cs( dir,name , distance, gse);
+		if (!nav.empty())
+		{
+			NavSegment ps = nav[nav.size() - 1];
+			if (ps.m_streetName != cs.m_streetName)
+			{
+				NavSegment ts(directiont(ps.m_geoSegment, cs.m_geoSegment), cs.m_streetName);
+				nav.push_back(ts);
+			}
+		}
+		nav.push_back(cs);
+	}
+	direction = nav;
 	
-
-
 	return true;
 }
 
@@ -138,6 +248,22 @@ bool NavigatorImpl::geo_included(const node & coord, const std::vector<node>& ve
 			return true;
 	}
 	return false;
+}
+
+double NavigatorImpl::GetAngleABC(const GeoCoord & a, const GeoCoord & b, const GeoCoord & c) const
+{
+
+	GeoCoord ab;
+	ab.latitude = a.latitude - b.latitude;
+	ab.longitude = a.longitude - b.longitude;
+	GeoCoord cb;
+	cb.latitude = c.latitude - b.latitude;
+	cb.longitude = c.longitude - b.longitude;
+
+	double dot= (ab.latitude*cb.latitude + ab.longitude*cb.longitude);
+	double cross = (ab.latitude * cb.longitude - ab.longitude * cb.latitude);
+	double alpha = atan2(cross, dot);
+	return (double)floor(alpha * 180 / 3.1415926 + 0.5);
 }
 
 
