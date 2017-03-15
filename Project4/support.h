@@ -34,7 +34,9 @@ bool operator== (const GeoCoord& Geo_1, const GeoCoord& Geo_2);
 struct node
 {
 	node() {};
-	node(GeoCoord geo, std::string streetname) : node_geo(geo), street_name(streetname)
+	node(GeoCoord geo) : node_geo(geo)
+	{};
+	node(GeoCoord geo, double g, double f) : node_geo(geo), f_value(f), g_value(g)
 	{};
 	/*bool operator== (const node& a)
 	{
@@ -59,7 +61,12 @@ struct node
 	}*/
 
 	GeoCoord node_geo;
-	std::string street_name;
+	//std::string street_name;
+	double f_value;
+	double g_value;
+	node* prev;
+	node* next;
+	
 };
 
 bool operator==(const node& b, const node& a);

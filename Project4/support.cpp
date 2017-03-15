@@ -47,21 +47,21 @@ bool operator== (const GeoCoord& Geo_1, const GeoCoord& Geo_2)
 }
 bool operator==(const node & b, const node & a)
 {
-	if (b.node_geo == a.node_geo && b.street_name == a.street_name)
+	if (b.node_geo == a.node_geo)
 		return true;
 	else
 		return false;
 }
 bool operator<(const node & a, const node & b)
 {
-	if (a.node_geo < b.node_geo)
+	if (a.f_value < b.f_value)
 		return true;
 	else
 		return false;
 }
 bool operator>(const node & a, const node & b)
 {
-	if (a.node_geo > b.node_geo)
+	if (a.f_value > b.f_value)
 		return true;
 	else
 		return false;
