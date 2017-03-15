@@ -305,10 +305,14 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 		{
 			//cerr << "========================1st FOR LOOP=====================" << endl;
 			double temp_fScore = *fScore.find(openset[i]);
-			if (temp_fScore < temp_lowest_f_score)	
-				temp_lowest_f_score = temp_fScore;
 			if (temp_fScore < temp_lowest_f_score)
+			{
 				delete_index = i;
+				temp_lowest_f_score = temp_fScore;
+			}
+				
+			//if (temp_fScore < temp_lowest_f_score)
+			//	delete_index = i;
 		}
 
 		current = openset[delete_index];
