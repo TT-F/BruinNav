@@ -18,42 +18,15 @@ public:
 	bool loadMapData(string mapFile);
 	NavResult navigate(string start, string end, vector<NavSegment>& directions) const;
 private:
+	
 	AttractionMapper am;
 	SegmentMapper sm;
 	MapLoader ml;
-	vector<GeoCoord> surrond_cord(const GeoCoord& start) const;
-	string angle_calculator(const GeoCoord& a, const GeoCoord& b);
-	bool reconstruct_path(GeoCoord& current, MyMap<GeoCoord, GeoCoord>& prev,  vector<NavSegment>& direction) const;
-	struct node
-	{
-		node() {};
-		node(GeoCoord geo, std::string streetname) : node_geo(geo), street_name(streetname)
-		{};
-		bool operator== (const node& a)
-		{
-			if (node_geo == a.node_geo && street_name == a.street_name)
-				return true;
-			else
-				return false; 
-		}
-		bool operator< (const node& a)
-		{
-			if (node_geo < a.node_geo)
-				return true;
-			else
-				return false; 
-		}
-		bool operator> (const node& a)
-		{
-			if (node_geo > a.node_geo)
-				return true;
-			else
-				return false;
-		}
+	vector<node> surrond_cord(const node& input) const;
+	string angle_calculator(const node& a, const node& b);
+	bool reconstruct_path(node& current, MyMap<node, node>& prev,  vector<NavSegment>& direction) const;
+	bool geo_included(const node& coord, const std::vector<node>& vec) const;
 
-		GeoCoord node_geo;
-		std::string street_name;
-	};
 };
 
 NavigatorImpl::NavigatorImpl()
@@ -78,57 +51,74 @@ bool NavigatorImpl::loadMapData(string mapFile)
 		return false;
 }
 
-vector<GeoCoord> NavigatorImpl::surrond_cord(const GeoCoord& input) const
+
+
+vector<node> NavigatorImpl::surrond_cord(const node & input) const
 {
-	vector<StreetSegment> streets = sm.getSegments(input);
-	vector<GeoCoord> cord;
+	vector<StreetSegment> streets = sm.getSegments(input.node_geo);
+	vector<node> cord;
 	for (unsigned i = 0; i < streets.size(); i++)
 	{
 
-		if (!(input == streets[i].segment.end))
-			cord.push_back(streets[i].segment.end);
-		if (!(input == streets[i].segment.start))
-			cord.push_back(streets[i].segment.start);
+		if (!(input.node_geo == streets[i].segment.end))
+		{
+			node temp;
+			temp.node_geo = streets[i].segment.end;
+			temp.street_name = streets[i].streetName;
+			cord.push_back(temp);
+		}
+		if (!(input.node_geo == streets[i].segment.start))
+		{
+			node temp;
+			temp.node_geo = streets[i].segment.start;
+			temp.street_name = streets[i].streetName;
+			cord.push_back(temp);
+		}	
 		for (unsigned k = 0; k < streets[i].attractions.size(); k++)
-			if (!(input == streets[i].attractions[k].geocoordinates))
-				cord.push_back(streets[i].attractions[k].geocoordinates);
+			if (!(input.node_geo == streets[i].attractions[k].geocoordinates))
+			{
+				node temp;
+				temp.node_geo = streets[i].attractions[k].geocoordinates;
+				temp.street_name = streets[i].streetName;
+				cord.push_back(temp);
+			}
 	}
 	return cord;
 }
 
-string NavigatorImpl::angle_calculator(const GeoCoord & a, const GeoCoord & b)
+string NavigatorImpl::angle_calculator(const node & a, const node & b)
 {
-	GeoSegment temp(a, b);
+	GeoSegment temp(a.node_geo, b.node_geo);
 	double ang = angleOfLine(temp);
 	if (ang >= 0 && ang <= 22.5)
 		return "east";
-	if (ang >= 22.5 && ang <= 67.5)
+	else if (ang >= 22.5 && ang <= 67.5)
 		return "northeast";
-	if (ang >= 67.5 && ang <= 112.5)
+	else if (ang >= 67.5 && ang <= 112.5)
 		return "north";
-	if (ang >= 112.5 && ang <= 157.5)
+	else if (ang >= 112.5 && ang <= 157.5)
 		return "northwest";
-	if (ang >= 157.5 && ang <= 202.5)
+	else if (ang >= 157.5 && ang <= 202.5)
 		return "west";
-	if (ang >= 202.5 && ang <= 247.5)
+	else if (ang >= 202.5 && ang <= 247.5)
 		return "southwest";
-	if (ang >= 247.5 && ang <= 292.5)
+	else if (ang >= 247.5 && ang <= 292.5)
 		return "south";
-	if (ang >= 292.5 && ang <= 337.5)
+	else if (ang >= 292.5 && ang <= 337.5)
 		return "southeast";
 	else if (ang >= 337.5 && ang <= 360)
 		return "east";
 
 }
 
-bool NavigatorImpl::reconstruct_path(GeoCoord & current, MyMap<GeoCoord, GeoCoord>& prev, vector<NavSegment>& direction) const
+bool NavigatorImpl::reconstruct_path(node & current, MyMap<node, node>& prev, vector<NavSegment>& direction) const
 {
-	stack<GeoCoord> geo_hld;
-	GeoCoord* previous_cord = &current;
+	stack<node> geo_hld;
+	node* previous_cord = &current;
 
 	while (previous_cord != nullptr)
 	{
-		cerr << previous_cord->latitudeText << "," << previous_cord->longitudeText << endl;
+		cerr << previous_cord->node_geo.latitudeText << "," << previous_cord->node_geo.longitudeText << endl;
 
 		geo_hld.push(*previous_cord);
 		previous_cord = prev.find(*previous_cord);
@@ -139,36 +129,51 @@ bool NavigatorImpl::reconstruct_path(GeoCoord & current, MyMap<GeoCoord, GeoCoor
 	return true;
 }
 
+bool NavigatorImpl::geo_included(const node & coord, const std::vector<node>& vec) const
+{
+	
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		if (vec[i].node_geo == coord.node_geo)
+			return true;
+	}
+	return false;
+}
+
 
 NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &directions) const
 {
 	////chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
 
-	GeoCoord start_cord, end_cord;
-	if (!am.getGeoCoord(start, start_cord))
+	node start_cord, end_cord;
+	if (!am.getGeoCoord(start, start_cord.node_geo))
 		return NAV_BAD_SOURCE;
-	if (!am.getGeoCoord(end, end_cord))
+	if (!am.getGeoCoord(end, end_cord.node_geo))
 		return NAV_BAD_DESTINATION;
 
+	//should be correct 
+	start_cord.street_name = sm.getSegments(start_cord.node_geo).front().streetName;
+	end_cord.street_name = sm.getSegments(end_cord.node_geo).front().streetName;
 
-	vector<GeoCoord> openset;
-	MyMap<GeoCoord, string> closedset;
-	//vector<GeoCoord> closedset;
+
+	vector<node> openset;
+	MyMap<node, string> closedset;
+	//vector<node> closedset;
 
 	openset.push_back(start_cord);
 
-	MyMap<GeoCoord, GeoCoord> prevnode;
+	MyMap<node, node> prevnode;
 
-	MyMap<GeoCoord, double> gScore;
+	MyMap<node, double> gScore;
 	gScore.associate(start_cord, 0);
-	MyMap<GeoCoord, double> fScore;
-	fScore.associate(start_cord, distanceEarthKM(start_cord, end_cord));
+	MyMap<node, double> fScore;
+	fScore.associate(start_cord, distanceEarthKM(start_cord.node_geo, end_cord.node_geo));
 	//int count = 0;
 	while (!openset.empty())
 	{
 		//cerr << "========================WHILE LOOP=====================" << endl;
 		unsigned delete_index = 0;
-		GeoCoord current = openset[0];
+		node current = openset[0];
 		double temp_lowest_f_score = *fScore.find(openset[0]);
 		for (int i = 0; i < openset.size();i++)
 		{
@@ -191,7 +196,7 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 		openset.erase(openset.begin() + delete_index);
 		closedset.associate(current, "abc");
 
-		vector<GeoCoord> surround = surrond_cord(current);
+		vector<node> surround = surrond_cord(current);
 		
 		for (int i = 0; i < surround.size();i++)
 		{
@@ -200,7 +205,7 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 
 				continue;
 			
-			double tent_gScore = *gScore.find(current) + distanceEarthKM(current, surround[i]);
+			double tent_gScore = *gScore.find(current) + distanceEarthKM(current.node_geo, surround[i].node_geo);
 			if (!geo_included(surround[i], openset))				
 				openset.push_back(surround[i]);
 			
@@ -209,7 +214,7 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 
 			prevnode.associate(surround[i], current);
 			gScore.associate(surround[i], tent_gScore);
-			fScore.associate(surround[i], *gScore.find(surround[i]) + distanceEarthKM(surround[i], end_cord));
+			fScore.associate(surround[i], *gScore.find(surround[i]) + distanceEarthKM(surround[i].node_geo, end_cord.node_geo));
 
 		}
 		

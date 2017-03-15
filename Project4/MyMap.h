@@ -7,7 +7,7 @@
 #define MyMap_h
 
 #include <iostream>
-
+#include"support.h"
 
 template<typename KeyType, typename ValueType>
 class MyMap

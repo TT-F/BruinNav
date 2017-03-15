@@ -31,7 +31,44 @@ bool operator== (const GeoCoord& Geo_1, const GeoCoord& Geo_2);
 //void copy(Streetnode& sn, const StreetSegment& input);
 //void vector_copy(std::vector<Streetnode>& sn, const std::vector<StreetSegment>& ss);
 
-bool geo_included(const GeoCoord& coord, const std::vector<GeoCoord>& vec);
+struct node
+{
+	node() {};
+	node(GeoCoord geo, std::string streetname) : node_geo(geo), street_name(streetname)
+	{};
+	/*bool operator== (const node& a)
+	{
+		if (node_geo == a.node_geo && street_name == a.street_name)
+			return true;
+		else
+			return false;
+	}
+	bool operator< (const node& a)
+	{
+		if (node_geo < a.node_geo)
+			return true;
+		else
+			return false;
+	}
+	bool operator> (const node& a)
+	{
+		if (node_geo > a.node_geo)
+			return true;
+		else
+			return false;
+	}*/
+
+	GeoCoord node_geo;
+	std::string street_name;
+};
+
+bool operator==(const node& b, const node& a);
+
+
+bool operator< (const node& a, const node& b);
+
+
+bool operator> (const node& a, const node& b);
 
 
 

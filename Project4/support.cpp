@@ -45,6 +45,27 @@ bool operator== (const GeoCoord& Geo_1, const GeoCoord& Geo_2)
 {
 	return (Geo_1.latitude == Geo_2.latitude && Geo_1.longitude == Geo_2.longitude);
 }
+bool operator==(const node & b, const node & a)
+{
+	if (b.node_geo == a.node_geo && b.street_name == a.street_name)
+		return true;
+	else
+		return false;
+}
+bool operator<(const node & a, const node & b)
+{
+	if (a.node_geo < b.node_geo)
+		return true;
+	else
+		return false;
+}
+bool operator>(const node & a, const node & b)
+{
+	if (a.node_geo > b.node_geo)
+		return true;
+	else
+		return false;
+}
 //
 //bool operator== (const StreetSegment& st_1, const StreetSegment& st_2)
 //{
@@ -94,15 +115,7 @@ bool operator== (const GeoCoord& Geo_1, const GeoCoord& Geo_2)
 //	}
 //}
 
-bool geo_included(const GeoCoord& coord, const std::vector<GeoCoord>& vec)
-{
-	for (size_t i = 0; i < vec.size(); i++)
-	{
-		if (vec[i] == coord)
-			return true;
-	}
-	return false;
-}
+
 
 //Streetnode& Streetnode::operator= (const StreetSegment& ss)
 //{
