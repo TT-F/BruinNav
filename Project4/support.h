@@ -77,7 +77,7 @@ bool operator< (const node& a, const node& b);
 
 bool operator> (const node& a, const node& b);
 
-
+//std::string angle_calculator(const node & a, const node & b);
 
 #endif // !Sup_h
 

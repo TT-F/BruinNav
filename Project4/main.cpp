@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <chrono>
+//#include <vld.h>
 #include "MyMap.h"
 #include "provided.h"
 
@@ -123,10 +124,10 @@ void testNav()
 	Navigator nv;
 	nv.loadMapData("C:/Users/Steven Shi/Source/Repos/Project4/Project4/mapdata.txt");
 	vector<NavSegment> segs;
-	//cerr<< nv.navigate("Los Angeles Fire Department Fire Station 92", "UCLA Police Department", segs);
+	nv.navigate("Los Angeles Fire Department Fire Station 92", "UCLA Police Department", segs);
 	//cerr << nv.navigate( "Beverly Hills Marriott", "Nuart Theatre", segs);
 	//cerr << nv.navigate("Beverly Hills Marriott", "De Neve Plaza", segs);
-	nv.navigate("Brentwood Country Mart", "Los Angeles Fire Department Fire Station 58", segs);
+	//nv.navigate("Brentwood Country Mart", "Los Angeles Fire Department Fire Station 58", segs);
 
 	//cerr << nv.navigate(  "Nuart Theatre", "De Neve Plaza", segs);
 	//cerr << nv.navigate("Nuart Theatre", "Beverly Hills Marriott", segs);
@@ -144,7 +145,7 @@ void testNav()
 		else
 			cout << "Turn " << segs[i].m_direction << " onto " << segs[i].m_streetName << endl;
 	}
-	cout << distance << " km in total." << endl;
+	cout << distance << " miles in total." << endl;
 	cout << "Passed" << endl;
 }
 
@@ -158,3 +159,4 @@ int main()
 	testNav();
 
 }
+

@@ -66,6 +66,32 @@ bool operator>(const node & a, const node & b)
 	else
 		return false;
 }
+
+//std::string angle_calculator(const node & a, const node & b)
+//{
+//	GeoSegment temp(a.node_geo, b.node_geo);
+//	double ang = angleOfLine(temp);
+//	if (ang >= 0 && ang <= 22.5)
+//		return "east";
+//	else if (ang >= 22.5 && ang <= 67.5)
+//		return "northeast";
+//	else if (ang >= 67.5 && ang <= 112.5)
+//		return "north";
+//	else if (ang >= 112.5 && ang <= 157.5)
+//		return "northwest";
+//	else if (ang >= 157.5 && ang <= 202.5)
+//		return "west";
+//	else if (ang >= 202.5 && ang <= 247.5)
+//		return "southwest";
+//	else if (ang >= 247.5 && ang <= 292.5)
+//		return "south";
+//	else if (ang >= 292.5 && ang <= 337.5)
+//		return "southeast";
+//	else if (ang >= 337.5 && ang <= 360)
+//		return "east";
+//	else
+//		return "error";
+//}
 //
 //bool operator== (const StreetSegment& st_1, const StreetSegment& st_2)
 //{

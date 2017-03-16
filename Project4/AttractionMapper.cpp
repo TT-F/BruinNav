@@ -46,7 +46,7 @@ void AttractionMapperImpl::init(const MapLoader& ml)
 
 bool AttractionMapperImpl::getGeoCoord(string attraction, GeoCoord& gc) const
 {
-	const GeoCoord* gc_ptr = new GeoCoord();
+	const GeoCoord* gc_ptr;
 	gc_ptr = Att_hld.find(attraction);
 	if (gc_ptr != nullptr)
 	{

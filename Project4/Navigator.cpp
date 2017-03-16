@@ -36,7 +36,8 @@ private:
 	public:
 		typedef typename
 			std::priority_queue<T,Container,Compare>::container_type::const_iterator const_iterator;
-
+		typedef typename
+			std::priority_queue<T, Container, Compare>::container_type::const_reference const_reference;
 		bool find(const T&val) const
 		{
 			auto first = this->c.cbegin();
@@ -330,17 +331,36 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 		double lowest_f_score = current.f_value;
 		if (current == end_cord)
 		{
-			//TODO***************
-			/*node* ptr = &current;
-			while (ptr->prev != nullptr)
-			{
-				cerr << ptr->node_geo.latitudeText << "," << ptr->node_geo.longitudeText << endl;
-				ptr = ptr->prev;
-			}*/
+			
 			if (reconstruct_path(current, directions))
+			{
+				while (!openset.empty())
+				{
+					delete openset.top().prev;
+					openset.pop();
+				}
+				while (!closeset.empty())
+				{
+					delete closeset.back().prev;
+					closeset.pop_back();
+				}
 				return NAV_SUCCESS;
+			}			
 			else
+			{
+				while (!openset.empty())
+				{
+					delete openset.top().prev;
+					openset.pop();
+				}
+				while (!closeset.empty())
+				{
+					delete closeset.back().prev;
+					closeset.pop_back();
+				}
 				return NAV_NO_ROUTE;
+			}
+				
 		}
 		openset.pop();
 		closeset.push_back(current);
@@ -354,8 +374,8 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 				continue;
 			if (!openset.find(evalu[i]))
 			{
-				evalu[i].prev = new node;
-				*evalu[i].prev=closeset.back();
+				evalu[i].prev = new node(closeset.back());
+				//*evalu[i].prev=closeset.back();
 				openset.push(evalu[i]);
 			}			
 			else if (openset.find_it(evalu[i]) != openset.end())
@@ -366,7 +386,16 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 
 
 	}
-	
+	while (!openset.empty())
+	{
+		delete openset.top().prev;
+		openset.pop();
+	}
+	while (!closeset.empty())
+	{
+		delete closeset.back().prev;
+		closeset.pop_back();
+	}
 	
 	return NAV_NO_ROUTE;
 
