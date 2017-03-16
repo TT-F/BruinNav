@@ -148,7 +148,7 @@ template<typename KeyType, typename ValueType>
 inline void MyMap<KeyType, ValueType>::associate_helper(const KeyType & key, const ValueType & value, node * leaf)
 {
 
-	if (leaf == nullptr)
+	if (leaf == nullptr) //if the leaf is empty 
 	{
 		//std::cerr << "aa" << std::endl;
 		root = new node; 
@@ -159,16 +159,16 @@ inline void MyMap<KeyType, ValueType>::associate_helper(const KeyType & key, con
 		m_size++;
 		//root = newNode(key, value);
 	}
-	else if (key == leaf->m_key)
+	else if (key == leaf->m_key) //if there exists a node with same key, we replace the value 
 	{
 		//std::cerr << "b" << std::endl;
 		leaf->m_value = value;
 	}
-	else if (key < leaf->m_key)
+	else if (key < leaf->m_key) //if its smaller 
 	{
 		//std::cerr << "c" << std::endl;
-		if (leaf->left != nullptr)
-			associate_helper(key, value, leaf->left);
+		if (leaf->left != nullptr) //go to left 
+			associate_helper(key, value, leaf->left); //recrusion until you find the smallest 
 		else
 		{
 			leaf->left = new node;
@@ -179,11 +179,11 @@ inline void MyMap<KeyType, ValueType>::associate_helper(const KeyType & key, con
 			m_size++;
 		}
 	}
-	else if (key > leaf->m_key)
+	else if (key > leaf->m_key) //if its larger
 	{
 		//std::cerr << "d" << std::endl;
-		if (leaf->right != nullptr)
-			associate_helper(key, value, leaf->right);
+		if (leaf->right != nullptr) //go to right 
+			associate_helper(key, value, leaf->right); //recrusion until you find the largest 
 		else
 		{
 			leaf->right = new node;

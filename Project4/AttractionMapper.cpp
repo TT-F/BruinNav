@@ -25,9 +25,9 @@ AttractionMapperImpl::~AttractionMapperImpl()
 
 void AttractionMapperImpl::init(const MapLoader& ml)
 {
-	int size = ml.getNumSegments();
+	int size = ml.getNumSegments(); //total number of street segements
 	//cerr << "number of segments" << size << endl;
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < size; i++) //going through  each stree 
 	{
 		//cerr << "processing " << i << " segament" << endl;
 		StreetSegment st_ptr; 
@@ -37,7 +37,7 @@ void AttractionMapperImpl::init(const MapLoader& ml)
 		int walk = 0;
 		while (walk < att_size) //skip when there is no attraction 
 		{
-			Att_hld.associate(st_ptr.attractions[walk].name,st_ptr.attractions[walk].geocoordinates);
+			Att_hld.associate(st_ptr.attractions[walk].name,st_ptr.attractions[walk].geocoordinates); //add to the mymap 
 			walk++;
 		}
 	}
@@ -47,8 +47,8 @@ void AttractionMapperImpl::init(const MapLoader& ml)
 bool AttractionMapperImpl::getGeoCoord(string attraction, GeoCoord& gc) const
 {
 	const GeoCoord* gc_ptr;
-	gc_ptr = Att_hld.find(attraction);
-	if (gc_ptr != nullptr)
+	gc_ptr = Att_hld.find(attraction); //find the geo coord according to the name of teh attraction 
+	if (gc_ptr != nullptr) //if there is one
 	{
 		gc = *gc_ptr;
 		return true; 

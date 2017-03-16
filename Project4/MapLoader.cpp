@@ -43,13 +43,51 @@ bool MapLoaderImpl::load(string mapFile)
 		//cerr << "entering load function CP 1" << endl;
 		StreetSegment* temp_seg= new StreetSegment;
 		string start_lat, start_long, end_lat, end_long; 
-		getline(infile, start_lat, ',');
-		infile.ignore();
-		//cerr << "entering load function CP 2" << endl;
-		getline(infile, start_long, ' ');
-		getline(infile, end_lat, ',');
-		getline(infile, end_long);
+		string line;
+		//getline(infile, start_lat, ',');
+		//infile.ignore();
+		////cerr << "entering load function CP 2" << endl;
+		//getline(infile, start_long, ' ');
+		//if (start_long.front() == ' ')
+		//	cerr << start_long.front() << endl;
+		//getline(infile, end_lat, ',');
+		//infile.ignore();
+		//getline(infile, end_long);
 		//cerr << "entering load function CP 3" << endl;
+		getline(infile, line);
+		for (unsigned i = 0; i < line.size();i++)
+		{
+			if (line.at(i) == ',')
+			{
+				start_lat = line.substr(0, i);
+				line.erase(0, i+1);
+				break;
+			}
+		}
+		for (unsigned i = 0; i < line.size();i++)
+		{
+			if (line.at(i) == ' ' && i != 0)
+			{
+				start_long = line.substr(0, i);
+				line.erase(0, i+1);
+				break;
+			}
+		}
+		if (*start_long.begin() == ' ')
+			start_long.erase(start_long.begin());
+
+		for (unsigned i = 0; i < line.size();i++)
+		{
+			if (line.at(i) == ',' )
+			{
+				end_lat = line.substr(0, i);
+				line.erase(0, i + 1);
+				break;
+			}
+		}
+		end_long = line;
+		if (*end_long.begin() == ' ')
+			end_long.erase(end_long.begin());
 		int count;
 		infile >> count;
 		//cerr << "Initial count" << count << endl;
@@ -59,10 +97,29 @@ bool MapLoaderImpl::load(string mapFile)
 		while (count!= 0)
 		{
 			//cerr << "entering load function CP entering while" << endl;
-			getline(infile, att_name, '|');
-			getline(infile, att_lat, ',');
-			infile.ignore();
-			getline(infile, att_long);
+			line = "";
+			getline(infile, line);
+			for (unsigned i = 0; i < line.size();i++)
+			{
+				if (line.at(i) == '|')
+				{
+					att_name = line.substr(0, i);
+					line.erase(0, i + 1);
+					break;
+				}
+			}
+			for (unsigned i = 0; i < line.size();i++)
+			{
+				if (line.at(i) == ',')
+				{
+					att_lat = line.substr(0, i);
+					line.erase(0, i + 1);
+					break;
+				}
+			}
+			att_long = line;
+			if (*att_long.begin() == ' ')
+				att_long.erase(att_long.begin());
 			//cerr << "entering load function CP W 1" << endl;
 			GeoCoord att_cord(att_lat, att_long);
 			Attraction att;
