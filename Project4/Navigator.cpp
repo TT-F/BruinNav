@@ -27,10 +27,8 @@ private:
 	vector<node> surrond_cord(const node& input, const node& end) const;
 	string angle_calculator(const node& a, const node& b) const;
 	bool reconstruct_road(node& g1, node& g2, StreetSegment& s) const; 
-	bool reconstruct_path(node& current, MyMap<node, node>& prev,  vector<NavSegment>& direction) const;
+	bool reconstruct_path(node& current,  vector<NavSegment>& direction) const;
 	bool geo_included(const node& coord, const std::vector<node>& vec) const;
-	double GetAngleABC(const GeoCoord& a, const GeoCoord& b, const GeoCoord& c) const; 
-
 
 	template<class T,class Container = std::vector<T>, class Compare = std::less<typename Container::value_type>
 > class MyQueue : public std::priority_queue<T, Container, Compare>
@@ -38,7 +36,8 @@ private:
 	public:
 		typedef typename
 			std::priority_queue<T,Container,Compare>::container_type::const_iterator const_iterator;
-
+		typedef typename
+			std::priority_queue<T, Container, Compare>::container_type::const_reference const_reference;
 		bool find(const T&val) const
 		{
 			auto first = this->c.cbegin();
@@ -91,10 +90,10 @@ NavigatorImpl::~NavigatorImpl()
 
 bool NavigatorImpl::loadMapData(string mapFile)
 {
-	cerr << "entering loading " << endl;
+	//cerr << "entering loading " << endl;
 	if (ml.load(mapFile))
 	{
-		cerr << "lm check point 1" << endl;
+		//cerr << "lm check point 1" << endl;
 		am.init(ml);
 		sm.init(ml);
 		return true;
@@ -198,17 +197,17 @@ bool NavigatorImpl::reconstruct_road(node & a, node & b, StreetSegment & s) cons
 	return false; 
 }
 
-bool NavigatorImpl::reconstruct_path(node & current, MyMap<node, node>& prev, vector<NavSegment>& direction) const
+bool NavigatorImpl::reconstruct_path(node & current, vector<NavSegment>& direction) const
 {
 	stack<node> geo_hld;
 	node* previous_cord = &current;
 
 	while (previous_cord != nullptr)
 	{
-		cerr << previous_cord->node_geo.latitudeText << "," << previous_cord->node_geo.longitudeText << endl;
+		//cerr << previous_cord->node_geo.latitudeText << "," << previous_cord->node_geo.longitudeText << endl;
 
 		geo_hld.push(*previous_cord);
-		previous_cord = prev.find(*previous_cord);
+		previous_cord = previous_cord->prev;
 	}
 	vector<NavSegment> nav;
 	while (!geo_hld.empty())
@@ -307,22 +306,6 @@ bool NavigatorImpl::geo_included(const node & coord, const std::vector<node>& ve
 	return false;
 }
 
-double NavigatorImpl::GetAngleABC(const GeoCoord & a, const GeoCoord & b, const GeoCoord & c) const
-{
-
-	GeoCoord ab;
-	ab.latitude = a.latitude - b.latitude;
-	ab.longitude = a.longitude - b.longitude;
-	GeoCoord cb;
-	cb.latitude = c.latitude - b.latitude;
-	cb.longitude = c.longitude - b.longitude;
-
-	double dot= (ab.latitude*cb.latitude + ab.longitude*cb.longitude);
-	double cross = (ab.latitude * cb.longitude - ab.longitude * cb.latitude);
-	double alpha = atan2(cross, dot);
-	return (double)floor(alpha * 180 / 3.1415926 + 0.5);
-}
-
 NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &directions) const
 {
 	
@@ -348,15 +331,36 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 		double lowest_f_score = current.f_value;
 		if (current == end_cord)
 		{
-			//TODO***************
-			node* ptr = &current;
-			while (ptr->prev != nullptr)
-			{
-				cerr << ptr->node_geo.latitudeText << "," << ptr->node_geo.longitudeText << endl;
-				ptr = ptr->prev;
-			}
 			
-			return NAV_SUCCESS;
+			if (reconstruct_path(current, directions))
+			{
+				while (!openset.empty())
+				{
+					delete openset.top().prev;
+					openset.pop();
+				}
+				while (!closeset.empty())
+				{
+					delete closeset.back().prev;
+					closeset.pop_back();
+				}
+				return NAV_SUCCESS;
+			}			
+			else
+			{
+				while (!openset.empty())
+				{
+					delete openset.top().prev;
+					openset.pop();
+				}
+				while (!closeset.empty())
+				{
+					delete closeset.back().prev;
+					closeset.pop_back();
+				}
+				return NAV_NO_ROUTE;
+			}
+				
 		}
 		openset.pop();
 		closeset.push_back(current);
@@ -370,8 +374,8 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 				continue;
 			if (!openset.find(evalu[i]))
 			{
-				evalu[i].prev = new node;
-				*evalu[i].prev=closeset.back();
+				evalu[i].prev = new node(closeset.back());
+				//*evalu[i].prev=closeset.back();
 				openset.push(evalu[i]);
 			}			
 			else if (openset.find_it(evalu[i]) != openset.end())
@@ -382,7 +386,16 @@ NavResult NavigatorImpl::navigate(string start, string end, vector<NavSegment> &
 
 
 	}
-	
+	while (!openset.empty())
+	{
+		delete openset.top().prev;
+		openset.pop();
+	}
+	while (!closeset.empty())
+	{
+		delete closeset.back().prev;
+		closeset.pop_back();
+	}
 	
 	return NAV_NO_ROUTE;
 

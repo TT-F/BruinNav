@@ -14,7 +14,8 @@ public:
 private:
 	//vector<StreetSegment> seg_map;
 	MyMap<string, vector<StreetSegment*>> My_segment;
-	
+	vector<StreetSegment*> segments_loader;
+	void process(GeoCoord input, StreetSegment* ss);
 };
 
 SegmentMapperImpl::SegmentMapperImpl()
@@ -23,66 +24,30 @@ SegmentMapperImpl::SegmentMapperImpl()
 
 SegmentMapperImpl::~SegmentMapperImpl()
 {
+	int size = segments_loader.size();
+	for (int i = 0; i < size;i++)
+	{
+		delete segments_loader[i];
+	}
+	
 	My_segment.clear();
 }
 
 void SegmentMapperImpl::init(const MapLoader& ml)
 {
-	int ml_size = ml.getNumSegments();
-	//cerr << "entring segament mapper init" << endl;
-	for (int i = 0; i < ml_size;i++)
+	for (int i = 0;i < ml.getNumSegments();i++)
 	{
-		//cerr << "entering for loop " << i << " times" << endl;
-		vector<StreetSegment*> segments_loader;
-		StreetSegment *st_ptr = new StreetSegment;
-
-		vector<GeoCoord> att_geo;
-		ml.getSegment(i, *st_ptr);
+		StreetSegment steet_seg;
+		ml.getSegment(i, steet_seg);
+		StreetSegment* st_ptr = new StreetSegment(steet_seg);
 		segments_loader.push_back(st_ptr);
-		//cerr << "SGM for loop check point A" << endl;
-		//check if My_segment has same coridnate 
-		//copy and add if there are 
-		//otherwise, use regular association 
-		string numst = geo_to_num(st_ptr->segment.start);
-		string numed = geo_to_num(st_ptr->segment.end);
-		//cerr << "SGM for loop check point B" << endl;
-		if (My_segment.find(numst) != nullptr)
+		process(steet_seg.segment.start, st_ptr);
+		process(steet_seg.segment.end, st_ptr);
+		for (int k = 0; k < steet_seg.attractions.size();k++)
 		{
-			segments_loader = *My_segment.find(numst);
-			segments_loader.push_back(st_ptr);
-			My_segment.associate(numst, segments_loader);
-		}
-		else
-			My_segment.associate(numst, segments_loader);
-		vector<StreetSegment*> segments_loader_1;
-		segments_loader_1.push_back(st_ptr);
-		if (My_segment.find(numed) != nullptr)
-		{
-			segments_loader_1 = *My_segment.find(numed);
-			segments_loader_1.push_back(st_ptr);
-			My_segment.associate(numed, segments_loader_1);
-		}
-		else
-			My_segment.associate(numed, segments_loader_1);
-		//Attraction
-		vector<StreetSegment*> segments_loader_2;
-		segments_loader_2.push_back(st_ptr);
-		int att_size = st_ptr->attractions.size();
-		int walk = 0;
-		//	cerr << "SGM for loop check point C" << endl;
-		while (walk < att_size)
-		{
-			//cerr << "SGM While---------- loop check point A" << endl;
-			string loc = geo_to_num(st_ptr->attractions[walk].geocoordinates);
-			if (My_segment.find(loc) != nullptr)
-			{
-				segments_loader_2 = *My_segment.find(loc);
-				segments_loader_2.push_back(st_ptr);
-				My_segment.associate(loc, segments_loader_2);
-			}
-			else
-				My_segment.associate(loc, segments_loader_2);
-			walk++;
+			GeoCoord ac = steet_seg.attractions[k].geocoordinates;
+			if (!(ac == steet_seg.segment.start || ac == steet_seg.segment.end))
+				process(ac, st_ptr);
 		}
 	}
 }
@@ -98,6 +63,16 @@ vector<StreetSegment> SegmentMapperImpl::getSegments(const GeoCoord& gc) const
 			segments.push_back(*(*ptr)[i]);
 	}
 	return segments;
+}
+
+void SegmentMapperImpl::process(GeoCoord input, StreetSegment * ss)
+{
+	string inst = geo_to_num(input);
+	vector<StreetSegment*>* sp = My_segment.find(inst);
+	if (sp != nullptr)
+		sp->push_back(ss);
+	else
+		My_segment.associate(inst, { ss });
 }
 
 //******************** SegmentMapper functions ********************************

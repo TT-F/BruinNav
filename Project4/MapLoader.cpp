@@ -95,7 +95,7 @@ size_t MapLoaderImpl::getNumSegments() const
 
 bool MapLoaderImpl::getSegment(size_t segNum, StreetSegment &seg) const
 {
-	if (segNum >= m_seg.size() || segNum <0) //cno
+	if (segNum >= m_seg.size()) //cno
 		return false;
 
 	seg = *(m_seg[segNum]);

@@ -209,6 +209,6 @@ inline void MyMap<KeyType, ValueType>::associate_helper(const KeyType & key, con
 
 
 
-#endif MyMap_h
+#endif //MyMap_h
 
 
